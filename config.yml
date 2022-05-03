@@ -1,45 +1,29 @@
 version: 2.1
+
+# Define the jobs we want to run for this project
 jobs:
+  build:
+    docker:
+      - image: cimg/<language>:<version TAG>
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
+      - checkout
+      - run: echo "this is the build job"
   test:
-    machine: true
+    docker:
+      - image: cimg/<language>:<version TAG>
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
     steps:
-      - run: echo "Test can run here!"
-  deploy:
-    machine: true
-    steps:
-      - run: echo "The deploy steps"
+      - checkout
+      - run: echo "this is the test job"
 
-  # handlers:
-  #   - url: /favicon\.ico
-  #     static_files: favicon.ico
-  #     upload: favicon\.ico
-  #   - url: /static
-  #     static_dir: public
-  #   - url: /.*
-  #     secure: always
-  #     redirect_http_response_code: 301
-  #     script: auto
-  # steps:
-  # - run:
-  #     name: Install Java & Maven
-  #     command: ssh $SSH_USER@$SSH_HOST "sudo apt-get update && sudo apt-get install -y curl git && sudo apt-get install -y openjdk-8-jdk && sudo apt-get install -y maven" 
-  # - run:
-  #     name: Clone Repo & Install Application Dependencies
-  #     command: ssh $SSH_USER@$SSH_HOST "git clone https://github.com/my-name/my-application.git && cd ~/project-path"
-  # - run:
-  #     name: Deploy Application
-  #     command: ssh $SSH_USER@$SSH_HOST "cd ~/project-path&& mvn verify"
-  # - run:
-  #     name: Run application 
-  #     command: ssh $SSH_USER@$SSH_HOST "cd ~/project-path && mvn -Dmaven.test.skip=true spring-boot:run" 
-
+# Orchestrate our job run sequence
 workflows:
-  version: 2.1
-  test-and-deploy:
+  build_and_test:
     jobs:
+      - build
       - test
-      # - handlers
-      - deploy:
-          requires:
-            - test
-            # - handlers
